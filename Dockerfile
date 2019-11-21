@@ -1,8 +1,10 @@
 FROM python:3-slim
 
-ADD server.py /
+COPY . /
 
-RUN pip install pyzmq
+ENV FLASK_APP="server.py"
 
-CMD [ "python", "./server.py" ]
+# install dependencies
+RUN pip install -r requirements.txt --no-cache-dir
 
+CMD [ "flask", "run" ]
