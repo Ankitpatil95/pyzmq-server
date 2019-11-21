@@ -16,6 +16,10 @@ Without Docker Image
 	
     ```pip install -r requirements.txt```
     
-3) Run Flask project: flask run
+3) Set ENV variable
 
-4) Now app is running at http://127.0.0.1:5000/
+	```export FLASK_APP=client.py```
+    
+4) Run Flask project: flask run
+
+5) Now app is running at http://127.0.0.1:5000/
