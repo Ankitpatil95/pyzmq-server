@@ -7,13 +7,15 @@ With Docker
 	```docker build -t python-server .```
 2) Run docker image file
 	
-    ```docker run -a stdin -a stdout -i -t --network="host" python-server```
+    ```docker run --network="host" python-server```
+3) Now app is running at http://127.0.0.1:5000/ 
 
 Without Docker Image
 1) Create virtualenv
-2) Install requirement.txt
+2) Install requirements.txt
 	
-    ```pip install -r requirement.txt```
-3) Run Server File
+    ```pip install -r requirements.txt```
+    
+3) Run Flask project: flask run
 
-    ```python server.py```
+4) Now app is running at http://127.0.0.1:5000/
