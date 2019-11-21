@@ -20,6 +20,8 @@ Without Docker Image
 
 	```export FLASK_APP=client.py```
     
-4) Run Flask project: flask run
+4) Run Flask project: 
+	
+	```flask run```
 
 5) Now app is running at http://127.0.0.1:5000/
