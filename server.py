@@ -2,7 +2,7 @@
 This module will allow client to connect with the server ip and Broadcast Message
 """
 import zmq
-from flask import request, jsonify
+from flask import request, json
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import safe_str_cmp
 from models import app, db, User
@@ -38,38 +38,23 @@ def index():
     return "Home"
 
 
-# @app.route("/login", methods=['POST', 'GET'])
-# def user_login():
-#     if request.method == "POST":
-#         req_dict = request.get_json()
-#         # req_dict = request.form
-#         user = User.query.filter_by(username=req_dict.get('username')).first()
-#         if user:
-#             return "render_template('home.html', context=user.username)"
-#         return "Check username/password!"
-#
-#     else:
-#         return "Method not allowed"
-
-
 @app.route("/register", methods=['POST', 'GET'])
 def register():
-    print(request)
     if request.method == "POST":
         request_dict = request.get_json()
-        # request_dict = request.form
-        print(request_dict)
-        print(request_dict.get('username'))
         user = User(username=request_dict.get('username'), email=request_dict.get('email'),
                     hash_password=request_dict.get('password'))
         db.session.add(user)
         db.session.commit()
-        # return render_template('login.html')
         user_dict = {"username": user.username, "message": "User created successfully"}
+        response = app.response_class(
+            response=json.dumps(user_dict),
+            status=200,
+            mimetype='application/json'
+        )
         db.session.remove()
-        return user_dict
+        return response
     else:
-        # return jsonify()
         pass
 
 
@@ -103,4 +88,4 @@ def send_message():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')
