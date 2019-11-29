@@ -1,6 +1,7 @@
 """
 This module will allow client to connect with the server ip and Broadcast Message
 """
+import os
 import zmq
 from flask import request, json
 from flask_jwt import JWT, jwt_required, current_identity
@@ -88,4 +89,4 @@ def send_message():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port='5000')
