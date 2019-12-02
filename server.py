@@ -5,6 +5,7 @@ import zmq
 from flask import request, json
 from flask_jwt import JWT, jwt_required
 from werkzeug.security import safe_str_cmp
+
 from models import app, db, User
 
 context = zmq.Context()
