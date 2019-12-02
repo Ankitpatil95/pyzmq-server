@@ -1,10 +1,9 @@
 """
 This module will allow client to connect with the server ip and Broadcast Message
 """
-import os
 import zmq
 from flask import request, json
-from flask_jwt import JWT, jwt_required, current_identity
+from flask_jwt import JWT, jwt_required
 from werkzeug.security import safe_str_cmp
 from models import app, db, User
 
@@ -13,9 +12,7 @@ zmq_socket = context.socket(zmq.PUB)
 
 
 def authenticate(username, password):
-    req_dict = request.get_json()
-    user = User.query.filter_by(username=req_dict.get('username')).first()
-    password = req_dict.get('password')
+    user = User.query.filter_by(username=username).first()
     if user and safe_str_cmp(user.hash_password.encode('utf-8'), password.encode('utf-8')):
         return user
 
@@ -43,18 +40,28 @@ def index():
 def register():
     if request.method == "POST":
         request_dict = request.get_json()
-        user = User(username=request_dict.get('username'), email=request_dict.get('email'),
-                    hash_password=request_dict.get('password'))
-        db.session.add(user)
-        db.session.commit()
-        user_dict = {"username": user.username, "message": "User created successfully"}
-        response = app.response_class(
-            response=json.dumps(user_dict),
-            status=200,
-            mimetype='application/json'
-        )
-        db.session.remove()
-        return response
+        db_user = authenticate(username=request_dict.get('username'), password=request_dict.get('password'))
+        if not db_user:
+            user = User(username=request_dict.get('username'), email=request_dict.get('email'),
+                        hash_password=request_dict.get('password'))
+            db.session.add(user)
+            db.session.commit()
+            user_dict = {"username": user.username, "message": "User created successfully"}
+            response = app.response_class(
+                response=json.dumps(user_dict),
+                status=200,
+                mimetype='application/json'
+            )
+            db.session.remove()
+            return response
+        else:
+            user_dict = {"username": request_dict.get('username'), "message": "User already exist"}
+            response = app.response_class(
+                response=json.dumps(user_dict),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
     else:
         pass
 
@@ -67,10 +74,21 @@ def bind_server():
     """
     try:
         zmq_socket.bind("tcp://0.0.0.0:5555")
-        return "render_template('send_message.html')"
-
+        socket_dict = {"message": "socket binded to IP."}
+        response = app.response_class(
+            response=json.dumps(socket_dict),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
     except Exception as e:
-        return "render_template('send_message.html')"
+        socket_dict = {"message": "Already binded to IP."}
+        response = app.response_class(
+            response=json.dumps(socket_dict),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
 
 
 @app.route('/send', methods=['GET', 'POST'])
@@ -82,9 +100,15 @@ def send_message():
     if request.method == "POST":
         msg = request.form['comment']
         zmq_socket.send(msg.encode('utf-8'))
-        return "Message sent successfully."
+        message_dict = {"message": "Message sent successfully."}
+        response = app.response_class(
+            response=json.dumps(message_dict),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
     else:
-        return "render_template('send_message.html')"
+        pass
 
 
 if __name__ == '__main__':
